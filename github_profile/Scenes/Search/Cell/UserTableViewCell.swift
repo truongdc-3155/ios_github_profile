@@ -12,7 +12,7 @@ class UserTableViewCell: UITableViewCell {
     @IBOutlet weak var avatarImage: UIImageView!
     
     @IBOutlet weak var usernameText: UILabel!
-    
+
     override func awakeFromNib() {
         super.awakeFromNib()
         selectionStyle = .none
@@ -25,18 +25,20 @@ class UserTableViewCell: UITableViewCell {
     
     private var imageTask: URLSessionDataTask?
 
-    func configCell(with user: User) {
-        usernameText.text = user.login
+    func loadAvatar(urlString: String) {
         avatarImage.image = nil
         imageTask?.cancel()
-        guard let url = URL(string: user.avatarUrl) else { return }
+        guard let url = URL(string: urlString) else { return }
         imageTask = URLSession.shared.dataTask(with: url) { data, _, _ in
             guard let data = data else { return }
-            DispatchQueue.main.async {
-                self.avatarImage.image = UIImage(data: data)
-            }
+            DispatchQueue.main.async { self.avatarImage.image = UIImage(data: data) }
         }
         imageTask?.resume()
+    }
+
+    func configCell(with user: User) {
+        usernameText.text = user.login
+        loadAvatar(urlString: user.avatarUrl)
     }
 
     override func prepareForReuse() {

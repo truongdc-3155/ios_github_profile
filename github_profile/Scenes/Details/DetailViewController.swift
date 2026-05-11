@@ -16,11 +16,28 @@ final class DetailViewController : UIViewController  {
     
     @IBOutlet weak var userNameText: UILabel!
     
+    @IBOutlet weak var favoriteButton: UIBarButtonItem!
+
     var user: User!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         fetchDetail()
+        updateFavoriteButton()
+    }
+
+    private func updateFavoriteButton() {
+        let isFav = CoreDataManager.shared.isFavorite(id: user.id)
+        favoriteButton.image = UIImage(systemName: isFav ? "heart.fill" : "heart")
+    }
+
+    @IBAction func favoriteButtonTapped(_ sender: UIBarButtonItem) {
+        if CoreDataManager.shared.isFavorite(id: user.id) {
+            CoreDataManager.shared.deleteUser(id: user.id)
+        } else {
+            CoreDataManager.shared.saveUser(user)
+        }
+        updateFavoriteButton()
     }
 
     private func fetchDetail() {
